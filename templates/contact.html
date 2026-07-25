@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Contact Us - DriveEasy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="section-title text-center">Get in Touch</h2>
+    <p class="section-subtitle text-center">Koi sawaal hai? Humein message karein</p>
+
+    <div class="row g-4 justify-content-center">
+        <div class="col-lg-7">
+            <div class="card car-card p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Name</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email</label>
+                            <input type="email" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Subject</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Message</label>
+                            <textarea class="form-control" rows="5" required></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary-brand mt-4">Send Message</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card car-card p-4 mb-2" style="height: 20%;">
+                <i class="bi bi-geo-alt fs-3" style="color:#ff5a1f;"></i>
+                <h6 class="mt-2">Our Location</h6>
+                <p class="text-muted mb-0">Himatnagar, Gujarat, India</p>
+            </div>
+            <div class="card car-card p-4 mb-3">
+                <i class="bi bi-telephone fs-3" style="color:#ff5a1f;"></i>
+                <h6 class="mt-2">Call Us</h6>
+                <p class="text-muted mb-0">+91 98765 43210</p>
+            </div>
+            <div class="card car-card p-4">
+                <i class="bi bi-envelope fs-3" style="color:#ff5a1f;"></i>
+                <h6 class="mt-2">Email Us</h6>
+                <p class="text-muted mb-0">support@driveeasy.com</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

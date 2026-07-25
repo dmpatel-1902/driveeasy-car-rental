@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}My Profile - DriveEasy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card car-card p-4 text-center">
+                {% if user.profile_picture %}
+                <img src="{{ user.profile_picture.url }}" class="rounded-circle mx-auto mb-3" style="width:110px;height:110px;object-fit:cover;">
+                {% else %}
+                <i class="bi bi-person-circle mx-auto mb-3" style="font-size:6rem;color:#ddd;"></i>
+                {% endif %}
+                <h4>{{ user.username }}</h4>
+                <p class="text-muted">{{ user.email }}</p>
+                <div class="d-flex justify-content-around mt-3">
+                    <div>
+                        <h5 class="mb-0">{{ total_bookings }}</h5>
+                        <small class="text-muted">Bookings</small>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">{% if user.is_verified %}<i class="bi bi-patch-check-fill text-success"></i>{% else %}<i class="bi bi-patch-exclamation text-warning"></i>{% endif %}</h5>
+                        <small class="text-muted">{% if user.is_verified %}Verified{% else %}Unverified{% endif %}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card car-card p-4 mb-4">
+                <h5 class="mb-3">Edit Profile</h5>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Username</label>
+                            {{ form.username }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Phone Number</label>
+                            {{ form.phone_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Driving License No.</label>
+                            {{ form.driving_license_number }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Address</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Profile Picture</label>
+                            {{ form.profile_picture }}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary-brand mt-4">Save Changes</button>
+                </form>
+            </div>
+
+            <div class="card car-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Recent Bookings</h5>
+                    <a href="{% url 'bookings:my_bookings' %}" class="btn btn-sm btn-outline-brand">View All</a>
+                </div>
+                {% for b in bookings %}
+                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                    <div>
+                        <strong>{{ b.car }}</strong>
+                        <div class="small text-muted">{{ b.pickup_date }} to {{ b.return_date }}</div>
+                    </div>
+                    <span class="badge status-{{ b.status }}">{{ b.get_status_display }}</span>
+                </div>
+                {% empty %}
+                <p class="text-muted mb-0">Abhi tak koi booking nahi hai.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

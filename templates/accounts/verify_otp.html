@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify OTP{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card car-card p-4">
+
+                <h3 class="text-center mb-1">Email Verification</h3>
+                <p class="text-center text-muted mb-4">
+                    We've sent a 6-digit OTP to <strong>{{ email }}</strong>
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Enter OTP</label>
+                        <input
+                            type="text"
+                            name="otp"
+                            maxlength="6"
+                            inputmode="numeric"
+                            pattern="[0-9]{6}"
+                            class="form-control text-center"
+                            placeholder="6-digit code"
+                            autofocus
+                            required
+                        >
+                    </div>
+                    <button type="submit" class="btn btn-primary-brand w-100">
+                        Verify &amp; Create Account
+                    </button>
+                </form>
+
+                <form method="post" action="{% url 'accounts:resend_otp' %}" class="text-center mt-3 mb-0">
+                    {% csrf_token %}
+                    <span class="text-muted">Didn't get the code?</span>
+                    <button type="submit" class="btn btn-link p-0 align-baseline">Resend OTP</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}My Bookings - DriveEasy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="section-title">My Bookings</h2>
+    <p class="section-subtitle">Aapki saari bookings ek jagah</p>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Car</th>
+                    <th>Pickup</th>
+                    <th>Return</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bookings %}
+                <tr>
+                    <td>#{{ b.id }}</td>
+                    <td>{{ b.car }}</td>
+                    <td>{{ b.pickup_date }}</td>
+                    <td>{{ b.return_date }}</td>
+                    <td>₹{{ b.total_amount }}</td>
+                    <td><span class="badge status-{{ b.status }}">{{ b.get_status_display }}</span></td>
+                    <td>
+                        <a href="{% url 'bookings:booking_detail' b.id %}" class="btn btn-sm btn-outline-brand">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-4">Aapne abhi tak koi booking nahi ki hai.
+                    <br><a href="{% url 'cars:car_list' %}" class="btn btn-primary-brand btn-sm mt-2">Browse Cars</a>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

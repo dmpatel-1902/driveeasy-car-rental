@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block title %}Browse Cars - DriveEasy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="section-title">Browse Our Fleet</h2>
+    <p class="section-subtitle">{{ total_results }} cars found</p>
+
+    <div class="row g-4">
+        <!-- Filters -->
+        <div class="col-lg-3">
+            <div class="filter-card sticky-top" style="top:90px;">
+                <h5 class="mb-3"><i class="bi bi-funnel"></i> Filters</h5>
+                <form method="get">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Search</label>
+                        <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Brand, model...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Category</label>
+                        <select name="category" class="form-select">
+                            <option value="">All</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Fuel Type</label>
+                        <select name="fuel_type" class="form-select">
+                            <option value="">Any</option>
+                            <option value="petrol" {% if selected_fuel == 'petrol' %}selected{% endif %}>Petrol</option>
+                            <option value="diesel" {% if selected_fuel == 'diesel' %}selected{% endif %}>Diesel</option>
+                            <option value="electric" {% if selected_fuel == 'electric' %}selected{% endif %}>Electric</option>
+                            <option value="hybrid" {% if selected_fuel == 'hybrid' %}selected{% endif %}>Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Transmission</label>
+                        <select name="transmission" class="form-select">
+                            <option value="">Any</option>
+                            <option value="manual" {% if selected_transmission == 'manual' %}selected{% endif %}>Manual</option>
+                            <option value="automatic" {% if selected_transmission == 'automatic' %}selected{% endif %}>Automatic</option>
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Min ₹/day</label>
+                            <input type="number" name="min_price" class="form-control" placeholder="0">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Max ₹/day</label>
+                            <input type="number" name="max_price" class="form-control" placeholder="10000">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Min Seats</label>
+                        <input type="number" name="seats" class="form-control" placeholder="e.g. 4">
+                    </div>
+                    <button type="submit" class="btn btn-primary-brand w-100">Apply Filters</button>
+                    <a href="{% url 'cars:car_list' %}" class="btn btn-light border w-100 mt-2">Clear All</a>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-end mb-3">
+                <form method="get" class="d-flex align-items-center gap-2">
+                    <input type="hidden" name="q" value="{{ query }}">
+                    <label class="form-label mb-0 small">Sort by:</label>
+                    <select name="sort" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+                        <option value="">Newest</option>
+                        <option value="price_low">Price: Low to High</option>
+                        <option value="price_high">Price: High to Low</option>
+                        <option value="rating">Top Rated</option>
+                    </select>
+                </form>
+            </div>
+
+            <div class="row g-4">
+                {% for car in page_obj %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card car-card">
+                        <div class="car-img-wrap">
+                            {% if car.image %}
+                            <img src="{{ car.image.url }}" alt="{{ car }}">
+                            {% else %}
+                            <i class="bi bi-car-front" style="font-size:4rem;color:#ccc;"></i>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <span class="badge-category">{{ car.category.name }}</span>
+                            {% if not car.is_available %}<span class="badge bg-secondary">Unavailable</span>{% endif %}
+                            <h5 class="mt-2 mb-1">{{ car.brand }} {{ car.model_name }}</h5>
+                            <p class="text-muted small mb-2">
+                                <i class="bi bi-people"></i> {{ car.seats }} Seats &nbsp;
+                                <i class="bi bi-gear"></i> {{ car.get_transmission_display }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="price-tag">₹{{ car.price_per_day }}<small class="text-muted">/day</small></span>
+                                <a href="{% url 'cars:car_detail' car.pk %}" class="btn btn-primary-brand btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-emoji-frown" style="font-size:3rem;color:#ccc;"></i>
+                    <p class="text-muted mt-3">Koi car nahi mili. Filters change karke try karein.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if page_obj.paginator.num_pages > 1 %}
+            <nav class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

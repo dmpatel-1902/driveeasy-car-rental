@@ -1,0 +1,232 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DriveEasy - Car Rental{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}"><i class="bi bi-car-front-fill"></i>
+                Drive<span>Easy</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav mx-auto gap-lg-3">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'cars:car_list' %}">Browse Cars</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+                </ul>
+                <div class="d-flex gap-2 mt-3 mt-lg-0">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'bookings:my_bookings' %}" class="btn btn-outline-brand btn-sm px-3">
+                        <i class="bi bi-journal-text"></i> My Bookings
+                    </a>
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-primary-brand btn-sm px-3">
+                        <i class="bi bi-person-circle"></i> {{ user.username }}
+                    </a>
+                    <a href="{% url 'accounts:logout' %}" class="btn btn-sm btn-light border">Logout</a>
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-brand btn-sm px-3">Login</a>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary-brand btn-sm px-3">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <h5><i class="bi bi-car-front-fill"></i> DriveEasy</h5>
+                    <p class="mt-3">Your trusted car rental service for every journey. We offer affordable prices, a
+                        wide selection of vehicles, and 24/7 customer support to ensure a safe, comfortable, and
+                        hassle-free travel experience.
+                    </p>
+                    <div class="d-flex gap-3 fs-5 mt-3">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#"><i class="bi bi-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><a href="{% url 'home' %}">Home</a></li>
+                        <li class="mb-2"><a href="{% url 'cars:car_list' %}">Browse Cars</a></li>
+                        <li class="mb-2"><a href="{% url 'about' %}">About Us</a></li>
+                        <li class="mb-2"><a href="{% url 'contact' %}">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5>Categories</h5>
+                    <ul class="list-unstyled mt-3">
+                        {% for cat in categories_footer %}
+                        <li class="mb-2"><a href="{% url 'cars:car_list' %}?category={{ cat.slug }}">{{ cat.name }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5>Contact Us</h5>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><i class="bi bi-geo-alt"></i> Himatnagar, Gujarat, India</li>
+                        <li class="mb-2"><i class="bi bi-telephone"></i> +91 98765 43210</li>
+                        <li class="mb-2"><i class="bi bi-envelope"></i> support@driveeasy.com</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="mt-4" style="border-color:#333;">
+            <p class="text-center small mb-0">&copy; {% now "Y" %} Darshan pate. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+
+
+
+
+
+
+
+    <script>
+
+        const usernameInput = document.getElementById("id_username");
+
+        const status = document.getElementById("username-status");
+
+        let timeout = null;
+
+        usernameInput.addEventListener("keyup", function () {
+
+            clearTimeout(timeout);
+
+            let username = this.value.trim();
+
+            if (username.length < 3) {
+
+                status.innerHTML = "";
+
+                return;
+
+            }
+
+            timeout = setTimeout(function () {
+
+                fetch(`/accounts/check-username/?username=${username}`)
+
+                    .then(response => response.json())
+
+                    .then(data => {
+
+                        if (data.available) {
+
+                            status.innerHTML = `
+                <div class="username-success">
+                    ✅ Username Available
+                </div>
+                `;
+
+                        }
+
+                        else {
+
+                            let html = `
+
+                <div class="username-error">
+
+                ❌ Username already taken
+
+                </div>
+
+                <small class="text-muted">
+                Try one of these:
+                </small>
+
+                <div class="mt-2">
+
+                `;
+
+                            data.suggestions.forEach(function (name) {
+
+                                html += `
+
+                    <span class="suggestion-chip">
+
+                    ${name}
+
+                    </span>
+
+                    `;
+
+                            });
+
+                            html += "</div>";
+
+                            status.innerHTML = html;
+
+                            document.querySelectorAll(".suggestion-chip").forEach(function (item) {
+
+                                item.onclick = function () {
+
+                                    usernameInput.value = this.innerText;
+
+                                    status.innerHTML = `
+
+                        <div class="username-success">
+
+                        ✔ Username Selected
+
+                        </div>
+
+                        `;
+
+                                }
+
+                            });
+
+                        }
+
+                    });
+
+            }, 500);
+
+        });
+
+    </script>
+
+
+</body>
+
+</html>

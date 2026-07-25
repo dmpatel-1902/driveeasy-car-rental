@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}DriveEasy - Rent a Car Anywhere, Anytime{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1>Rent the perfect car <br>for your next <span style="color:#ff5a1f;">journey</span></h1>
+                <p class="lead mt-3">{{ total_cars }}+ cars available across multiple categories. Best prices, zero
+                    hidden charges, instant booking confirmation.</p>
+                <div class="d-flex gap-3 mt-4 flex-wrap">
+                    <a href="{% url 'cars:car_list' %}" class="btn btn-primary-brand btn-lg">Browse Cars <i
+                            class="bi bi-arrow-right"></i></a>
+                    <a href="#categories" class="btn btn-outline-light btn-lg">Explore Categories</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="search-card">
+        <form action="{% url 'cars:car_list' %}" method="get" class="row g-3 align-items-end">
+            <div class="col-lg-4 col-md-6">
+                <label class="form-label fw-semibold">Search cars</label>
+                <input type="text" name="q" class="form-control" placeholder="Brand, model, or city">
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label fw-semibold">Category</label>
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.slug }}">{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label fw-semibold">Transmission</label>
+                <select name="transmission" class="form-select">
+                    <option value="">Any</option>
+                    <option value="manual">Manual</option>
+                    <option value="automatic">Automatic</option>
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <button type="submit" class="btn btn-primary-brand w-100"><i class="bi bi-search"></i> Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<section class="container py-5" id="categories">
+    <h2 class="section-title text-center">Browse by Category</h2>
+    <p class="section-subtitle text-center">Choose the Perfect Car for Every Need</p>
+    <div class="row g-3">
+        {% for cat in categories %}
+        <div class="col-6 col-md-4 col-lg-2">
+            <a href="{% url 'cars:car_list' %}?category={{ cat.slug }}" class="category-pill">
+                <i class="bi {{ cat.icon }}"></i>
+                <p class="mt-2 mb-0 fw-semibold">{{ cat.name }}</p>
+            </a>
+        </div>
+        {% empty %}
+        <p class="text-center text-muted">Categories jaldi add ki jayengi.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="container py-4">
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap">
+        <div>
+            <h2 class="section-title mb-1">Featured Cars</h2>
+            <p class="section-subtitle mb-0">Hamare sabse popular vehicles</p>
+        </div>
+        <a href="{% url 'cars:car_list' %}" class="btn btn-outline-brand">View All Cars</a>
+    </div>
+    <div class="row g-4">
+        {% for car in featured_cars %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card car-card">
+                <div class="car-img-wrap">
+                    {% if car.image %}
+                    <img src="{{ car.image.url }}" alt="{{ car }}">
+                    {% else %}
+                    <i class="bi bi-car-front" style="font-size:4rem;color:#ccc;"></i>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <span class="badge-category">{{ car.category.name }}</span>
+                    <h5 class="mt-2 mb-1">{{ car.brand }} {{ car.model_name }}</h5>
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-people"></i> {{ car.seats }} Seats &nbsp;
+                        <i class="bi bi-fuel-pump"></i> {{ car.get_fuel_type_display }} &nbsp;
+                        <i class="bi bi-gear"></i> {{ car.get_transmission_display }}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="price-tag">₹{{ car.price_per_day }}<small class="text-muted">/day</small></span>
+                        <a href="{% url 'cars:car_detail' car.pk %}" class="btn btn-primary-brand btn-sm">Book Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-muted">Abhi koi car available nahi hai. Please admin panel se cars add karein.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="py-5" style="background:#f7f8fa;">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-3 col-6">
+                <i class="bi bi-shield-check" style="font-size:2.5rem;color:#ff5a1f;"></i>
+                <h5 class="mt-3">Fully Insured</h5>
+                <p class="text-muted small">Every booking is covered with comprehensive insurance.</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <i class="bi bi-clock-history" style="font-size:2.5rem;color:#ff5a1f;"></i>
+                <h5 class="mt-3">24/7 Support</h5>
+                <p class="text-muted small">Contact us anytime—we're here to help, day or night.</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <i class="bi bi-cash-coin" style="font-size:2.5rem;color:#ff5a1f;"></i>
+                <h5 class="mt-3">Best Prices</h5>
+                <p class="text-muted small">No hidden charges. Transparent pricing with the best value.</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <i class="bi bi-geo-alt" style="font-size:2.5rem;color:#ff5a1f;"></i>
+                <h5 class="mt-3">Multiple Locations</h5>
+                <p class="text-muted small">Our services are available in multiple cities for your convenience.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
