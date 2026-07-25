@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Complete Payment | DriveEasy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h4 class="mb-0 text-center"><i class="fas fa-lock text-success me-2"></i> Secure Payment</h4>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <p class="text-muted mb-4">Please wait while we load the secure payment gateway...</p>
+                    
+                    <!-- Cashfree Checkout Element -->
+                    <div id="payment-form"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if environment == 'SANDBOX' %}
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+{% else %}
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+{% endif %}
+
+<script>
+    const cashfree = Cashfree({
+        mode: "{{ environment|lower }}"
+    });
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        let checkoutOptions = {
+            paymentSessionId: "{{ payment_session_id }}",
+            redirectTarget: "_self"
+        };
+        cashfree.checkout(checkoutOptions);
+    });
+</script>
+{% endblock %}

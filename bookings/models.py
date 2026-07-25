@@ -28,6 +28,15 @@ class Booking(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, editable=False, default=0)
     payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='cod')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    # Cashfree fields
+    cashfree_order_id = models.CharField(max_length=150, blank=True, null=True)
+    payment_status = models.CharField(
+        max_length=20, 
+        choices=(('PENDING', 'Pending'), ('SUCCESS', 'Success'), ('FAILED', 'Failed')), 
+        default='PENDING'
+    )
+    
     special_requests = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
