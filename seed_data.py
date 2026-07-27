@@ -20,6 +20,19 @@ if not CustomUser.objects.filter(username='admin').exists():
 else:
     print("Superuser 'admin' already exists.")
 
+# Create a regular test user
+if not CustomUser.objects.filter(username='testuser').exists():
+    user = CustomUser.objects.create_user(
+        username='testuser',
+        email='testuser@driveeasy.com',
+        password='Test@1234',
+        first_name='Test',
+        last_name='User',
+    )
+    print("Test user created -> username: testuser | password: Test@1234")
+else:
+    print("Test user already exists.")
+
 cats = [
     ('Sedan',     'sedan',     'bi-car-front'),
     ('SUV',       'suv',       'bi-truck'),
