@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: driveeasy
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn car_rental.wsgi --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
+    plan: free
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://driveeasy.onrender.com"
+      - key: CASHFREE_ENV
+        value: "SANDBOX"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CASHFREE_CLIENT_ID
+        sync: false
+      - key: CASHFREE_CLIENT_SECRET
+        sync: false
