@@ -17,19 +17,11 @@
                     {% csrf_token %}
                     <div class="row g-3">
                         <div class="col-md-6">
-
-                            <label class="form-label fw-semibold">
-                                Username
-                            </label>
-
+                            <label class="form-label fw-semibold">Username</label>
                             {{ form.username }}
-
                             {% if form.username.errors %}<small class="text-danger">{{ form.username.errors.0 }}</small>{% endif %}
-
                             <div id="username-status" class="mt-2"></div>
-
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Email</label>
                             {{ form.email }}
@@ -45,18 +37,17 @@
                             <div class="position-relative">
                                 {{ form.password1 }}
                                 <span class="password-toggle" onclick="togglePassword('id_password1', this)" title="Show/hide password">
-                                    <i class="fas fa-eye"></i>
+                                    <i class="bi bi-eye"></i>
                                 </span>
                             </div>
-                            {% if form.password1.errors %}<small class="text-danger">{{ form.password1.errors.0
-                                }}</small>{% endif %}
+                            {% if form.password1.errors %}<small class="text-danger">{{ form.password1.errors.0 }}</small>{% endif %}
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold">Confirm Password</label>
                             <div class="position-relative">
                                 {{ form.password2 }}
                                 <span class="password-toggle" onclick="togglePassword('id_password2', this)" title="Show/hide password">
-                                    <i class="fas fa-eye"></i>
+                                    <i class="bi bi-eye"></i>
                                 </span>
                             </div>
                             {% if form.password2.errors %}<small class="text-danger">{{ form.password2.errors.0 }}</small>{% endif %}
@@ -64,12 +55,12 @@
                     </div>
                     <button type="submit" class="btn btn-primary-brand w-100 mt-4">Create Account</button>
                 </form>
-                <p class="text-center mt-3 mb-0">Already have an account? <a href="{% url 'accounts:login' %}">Login</a>
-                </p>
+                <p class="text-center mt-3 mb-0">Already have an account? <a href="{% url 'accounts:login' %}">Login</a></p>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
@@ -78,12 +69,11 @@ function togglePassword(fieldId, icon) {
     const i = icon.querySelector('i');
     if (input.type === 'password') {
         input.type = 'text';
-        i.classList.replace('fa-eye', 'fa-eye-slash');
+        i.className = 'bi bi-eye-slash';
     } else {
         input.type = 'password';
-        i.classList.replace('fa-eye-slash', 'fa-eye');
+        i.className = 'bi bi-eye';
     }
 }
 </script>
-{% endblock %}
 {% endblock %}
