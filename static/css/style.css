@@ -312,3 +312,19 @@ footer a:hover {
     color: white;
 
 }
+
+/* ── Password show/hide toggle ───────────────────────────────────────────── */
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+    z-index: 5;
+    line-height: 1;
+    user-select: none;
+}
+.password-toggle:hover {
+    color: #f97316;
+}
