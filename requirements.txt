@@ -1,6 +1,6 @@
-django>=5.0
-pillow
-whitenoise[brotli]
-gunicorn
-cashfree-pg
-xhtml2pdf
+django>=5.0,<7
+pillow>=10.0
+whitenoise[brotli]>=6.0
+gunicorn>=21.0
+cashfree-pg>=3.0
+xhtml2pdf>=0.2.11

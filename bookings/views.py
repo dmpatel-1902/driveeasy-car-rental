@@ -14,46 +14,60 @@ from .models import Booking
 from .forms import BookingForm
 
 def create_cashfree_order(booking, request):
-    env = getattr(settings, 'CASHFREE_ENVIRONMENT', 'SANDBOX')
-    app_id = getattr(settings, 'CASHFREE_APP_ID', '')
-    secret = getattr(settings, 'CASHFREE_SECRET_KEY', '')
-    url = "https://sandbox.cashfree.com/pg/orders" if env == 'SANDBOX' else "https://api.cashfree.com/pg/orders"
-    
+    env = getattr(settings, 'CASHFREE_ENV', 'SANDBOX').upper()
+    client_id = getattr(settings, 'CASHFREE_CLIENT_ID', '')
+    client_secret = getattr(settings, 'CASHFREE_CLIENT_SECRET', '')
+
+    base_url = (
+        "https://sandbox.cashfree.com/pg/orders"
+        if env == 'SANDBOX'
+        else "https://api.cashfree.com/pg/orders"
+    )
+
     order_id = f"ORDER_{booking.id}_{uuid.uuid4().hex[:8]}"
     booking.cashfree_order_id = order_id
     booking.save()
 
-    phone = getattr(booking.user, 'phone', '9999999999') or '9999999999'
+    phone = str(getattr(booking.user, 'phone', '') or '9999999999').strip()
+    if not phone.isdigit() or len(phone) < 10:
+        phone = '9999999999'
     email = booking.user.email or "customer@example.com"
-    name = booking.user.get_full_name() or booking.user.username
+    name  = (booking.user.get_full_name() or booking.user.username)[:50]
 
     payload = {
-        "order_amount": float(booking.total_amount),
+        "order_amount":   float(booking.total_amount),
         "order_currency": "INR",
-        "order_id": order_id,
+        "order_id":       order_id,
         "customer_details": {
-            "customer_id": f"CUST_{booking.user.id}",
+            "customer_id":    f"CUST_{booking.user.id}",
             "customer_phone": phone,
             "customer_email": email,
-            "customer_name": name
+            "customer_name":  name,
         },
         "order_meta": {
-            "return_url": request.build_absolute_uri(f"/bookings/payment/callback/?order_id={order_id}")
-        }
+            "return_url": request.build_absolute_uri(
+                f"/bookings/payment/callback/?order_id={order_id}"
+            )
+        },
     }
-    
+
     headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "x-api-version": "2023-08-01",
-        "x-client-id": app_id,
-        "x-client-secret": secret
+        "accept":           "application/json",
+        "content-type":     "application/json",
+        "x-api-version":    "2023-08-01",
+        "x-client-id":      client_id,
+        "x-client-secret":  client_secret,
     }
-    
-    response = requests.post(url, json=payload, headers=headers)
-    if response.status_code == 200:
-        return response.json().get('payment_session_id')
-    print("Cashfree Error:", response.text)
+
+    try:
+        response = requests.post(base_url, json=payload, headers=headers, timeout=15)
+        if response.status_code == 200:
+            return response.json().get('payment_session_id')
+        # Log the full error so it shows in the dev-server console
+        print(f"[Cashfree] Order creation failed — HTTP {response.status_code}: {response.text}")
+    except requests.RequestException as exc:
+        print(f"[Cashfree] Network error while creating order: {exc}")
+
     return None
 
 @login_required
@@ -77,9 +91,10 @@ def create_booking_view(request, car_id):
                 payment_session_id = create_cashfree_order(booking, request)
                 if payment_session_id:
                     # Pass the session ID to a template that will trigger Cashfree SDK
+                    cf_env = getattr(settings, 'CASHFREE_ENV', 'SANDBOX').upper()
                     return render(request, 'bookings/cashfree_checkout.html', {
                         'payment_session_id': payment_session_id,
-                        'environment': getattr(settings, 'CASHFREE_ENVIRONMENT', 'SANDBOX')
+                        'cf_mode': 'sandbox' if cf_env == 'SANDBOX' else 'production',
                     })
                 else:
                     messages.error(request, 'Error initializing payment gateway. Please try again or choose Cash on Delivery.')
@@ -103,16 +118,20 @@ def payment_callback_view(request):
     booking = get_object_or_404(Booking, cashfree_order_id=order_id)
     
     # Verify order status with Cashfree
-    env = getattr(settings, 'CASHFREE_ENVIRONMENT', 'SANDBOX')
-    app_id = getattr(settings, 'CASHFREE_APP_ID', '')
-    secret = getattr(settings, 'CASHFREE_SECRET_KEY', '')
-    url = f"https://sandbox.cashfree.com/pg/orders/{order_id}" if env == 'SANDBOX' else f"https://api.cashfree.com/pg/orders/{order_id}"
-    
+    env = getattr(settings, 'CASHFREE_ENV', 'SANDBOX').upper()
+    client_id = getattr(settings, 'CASHFREE_CLIENT_ID', '')
+    client_secret = getattr(settings, 'CASHFREE_CLIENT_SECRET', '')
+    url = (
+        f"https://sandbox.cashfree.com/pg/orders/{order_id}"
+        if env == 'SANDBOX'
+        else f"https://api.cashfree.com/pg/orders/{order_id}"
+    )
+
     headers = {
-        "accept": "application/json",
-        "x-api-version": "2023-08-01",
-        "x-client-id": app_id,
-        "x-client-secret": secret
+        "accept":          "application/json",
+        "x-api-version":   "2023-08-01",
+        "x-client-id":     client_id,
+        "x-client-secret": client_secret,
     }
     
     response = requests.get(url, headers=headers)

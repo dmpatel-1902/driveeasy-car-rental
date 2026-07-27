@@ -24,15 +24,11 @@
 {% endblock %}
 
 {% block extra_js %}
-{% if environment == 'SANDBOX' %}
 <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-{% else %}
-<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-{% endif %}
 
 <script>
     const cashfree = Cashfree({
-        mode: "{{ environment|lower }}"
+        mode: "{{ cf_mode }}"  // Must be exactly "sandbox" or "production" (lowercase)
     });
     
     document.addEventListener("DOMContentLoaded", function() {
